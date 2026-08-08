@@ -1,0 +1,22 @@
+name: WhatsApp Push Notification
+
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    name: Notify WhatsApp
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Send push notification
+        uses: atifazeez77/whatsapp-push-notify-action@master
+        env:
+          account_sid: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          auth_token: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          to_whatsapp_no: ${{ secrets.WHATSAPP_TO_NUMBER }}
