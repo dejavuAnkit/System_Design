@@ -49,3 +49,35 @@ This basic app demonstrates the core RAG pipeline:
 - document retrieval using FAISS
 - question understanding
 - context-based answer generation
+
+## Ragas Evaluation
+
+Ragas can be used to evaluate the quality of the RAG application with a test set containing questions, retrieved contexts, generated answers, and reference answers where available.
+
+### Context Recall
+
+Context recall measures whether the retrieved document chunks contain the information needed to answer the question. A low score usually means that the FAISS search did not retrieve enough relevant context, so chunking, embeddings, or the number of retrieved documents may need improvement.
+
+### LLM Context Precision
+
+LLM context precision measures how much of the retrieved context is relevant to the question. A low score means that retrieval is returning too much unrelated information, which can distract the language model and increase the chance of an incorrect answer.
+
+### Factual Correctness
+
+Factual correctness measures whether the generated answer is accurate and supported by the expected answer or source information. A low score can indicate that the model misunderstood the retrieved context, included unsupported claims, or generated an answer that does not match the reference answer.
+
+### Evaluation flow
+
+```text
+Questions and documents
+    ↓
+Retrieve context from FAISS
+    ↓
+Generate answers
+    ↓
+Evaluate with Ragas
+    ↓
+Review context recall, LLM context precision, and factual correctness
+```
+
+Together, these metrics help identify whether a poor result comes from retrieval quality, irrelevant context, or answer generation.
