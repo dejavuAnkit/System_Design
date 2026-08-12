@@ -1,0 +1,40 @@
+name: WhatsApp Notification
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send WhatsApp notification
+        run: |
+          MESSAGE="🚀 New code pushed to ${{ github.repository }}
+
+          Branch: ${{ github.ref_name }}
+          Author: ${{ github.actor }}
+          Commit: ${{ github.sha }}
+
+          Commit message:
+          ${{ github.event.head_commit.message }}
+
+          🔗 ${{ github.event.head_commit.url }}"
+
+          curl -X POST \
+            "https://api.green-api.com/waInstance${{ secrets.GREEN_API_INSTANCE_ID }}/SendMessage/${{ secrets.GREEN_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg chatId "${{ secrets.WHATSAPP_PERSONAL_CHAT_ID }}" \
+              --arg message "$MESSAGE" \
+              '{chatId: $chatId, message: $message}')"
+
+          curl -X POST \
+            "https://api.green-api.com/waInstance${{ secrets.GREEN_API_INSTANCE_ID }}/SendMessage/${{ secrets.GREEN_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg chatId "${{ secrets.WHATSAPP_GROUP_CHAT_ID }}" \
+              --arg message "$MESSAGE" \
+              '{chatId: $chatId, message: $message}')"

@@ -2,6 +2,8 @@ name: WhatsApp Push Notification
 
 on:
   push:
+    branches:
+      - develop
 
 permissions:
   contents: read
@@ -15,8 +17,22 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Send push notification
-        uses: atifazeez77/whatsapp-push-notify-action@master
         env:
-          account_sid: ${{ secrets.TWILIO_ACCOUNT_SID }}
-          auth_token: ${{ secrets.TWILIO_AUTH_TOKEN }}
-          to_whatsapp_no: ${{ secrets.WHATSAPP_TO_NUMBER }}
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          WHATSAPP_TO_NUMBER: ${{ secrets.WHATSAPP_TO_NUMBER }}
+        run: |
+          set -euo pipefail
+
+          message="New code pushed to ${GITHUB_REPOSITORY}
+          Branch: ${GITHUB_REF_NAME}
+          Author: ${GITHUB_ACTOR}
+          Commit: ${GITHUB_SHA}
+          Details: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+
+          curl --fail-with-body --silent --show-error \
+            --user "${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}" \
+            --data-urlencode "From=whatsapp:+14155238886" \
+            --data-urlencode "To=whatsapp:${WHATSAPP_TO_NUMBER}" \
+            --data-urlencode "Body=${message}" \
+            "https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json"
